@@ -6,7 +6,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>Football Officiating Camps</title>
-<meta name="description" content="Interactive directory of football officiating camps across the United States.">
 
 <link rel="stylesheet" href="style.css">
 
@@ -43,9 +42,17 @@ href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
 <option value="">All Regions</option>
 </select>
 
+<select id="stateFilter">
+<option value="">All States</option>
+</select>
+
 </section>
 
 <div id="map"></div>
+
+<section class="listSection">
+
+<h2>Browse Camps</h2>
 
 <table id="campTable">
 
@@ -53,6 +60,7 @@ href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
 <tr>
 <th>Camp</th>
 <th>Location</th>
+<th>State</th>
 <th>Region</th>
 <th>Date</th>
 <th>Replay</th>
@@ -63,6 +71,8 @@ href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
 <tbody></tbody>
 
 </table>
+
+</section>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="script.js"></script>
