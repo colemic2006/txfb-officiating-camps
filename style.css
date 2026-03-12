@@ -1,76 +1,67 @@
-body {
-
-font-family: Arial, sans-serif;
+body{
+font-family:Arial, sans-serif;
 margin:0;
 background:#f4f6f8;
-
 }
 
-.header {
-
+.header{
 background:#0f172a;
 color:white;
 text-align:center;
 padding:40px 0;
-
 }
 
-.controls {
-
+.controls{
 display:flex;
 gap:10px;
 padding:20px;
 flex-wrap:wrap;
 justify-content:center;
-
 }
 
 .controls input,
-.controls select {
-
+.controls select{
 padding:10px;
 font-size:14px;
-
 }
 
-#map {
-
-height:500px;
-margin:20px;
+#map{
+height:420px;
+margin:20px auto;
+max-width:1200px;
 border-radius:8px;
-
 }
 
-table {
+.listSection{
+max-width:1200px;
+margin:auto;
+}
 
-width:95%;
+table{
+width:100%;
 margin:20px auto 60px auto;
 border-collapse:collapse;
 background:white;
 box-shadow:0 2px 8px rgba(0,0,0,0.08);
-
 }
 
-th,td {
-
+th,td{
 padding:12px;
 border-bottom:1px solid #ddd;
-
+text-align:left;
 }
 
-th {
-
+th{
 background:#f1f5f9;
-
 }
 
 @media(max-width:700px){
 
-#map {
+#map{
 height:350px;
 }
 
-table {
+table{
 font-size:14px;
 }
 
