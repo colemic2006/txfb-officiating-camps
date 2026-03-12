@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Football Officiating Camps</title>
+<meta name="description" content="Interactive directory of football officiating camps across the United States.">
+
+<link rel="stylesheet" href="style.css">
+
+<link
+rel="stylesheet"
+href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+/>
+
+</head>
+
+<body>
+
+<header class="header">
+<h1>Football Officiating Camps</h1>
+<p id="lastUpdated"></p>
+</header>
+
+<section class="controls">
+
+<input id="searchBox" placeholder="Search camp or location">
+
+<select id="monthFilter">
+<option value="">All Months</option>
+<option value="Jan">Jan</option>
+<option value="Feb">Feb</option>
+<option value="Mar">Mar</option>
+<option value="Apr">Apr</option>
+<option value="May">May</option>
+<option value="Jun">Jun</option>
+<option value="Jul">Jul</option>
+</select>
+
+<select id="regionFilter">
+<option value="">All Regions</option>
+</select>
+
+</section>
+
+<div id="map"></div>
+
+<table id="campTable">
+
+<thead>
+<tr>
+<th>Camp</th>
+<th>Location</th>
+<th>Region</th>
+<th>Date</th>
+<th>Replay</th>
+<th>Link</th>
+</tr>
+</thead>
+
+<tbody></tbody>
+
+</table>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="script.js"></script>
+
+</body>
+</html>
