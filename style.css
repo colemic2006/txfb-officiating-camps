@@ -1,82 +1,96 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
+/* GLOBAL */
 
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+body {
+font-family: Arial, sans-serif;
+margin: 0;
+background: #f4f6f8;
+color: #111;
+}
 
-<title>Football Officiating Camps</title>
+/* HEADER */
 
-<link rel="stylesheet" href="style.css">
+.header {
+background: #0f172a;
+color: white;
+text-align: center;
+padding: 40px 20px;
+}
 
-<link rel="stylesheet"
-href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+.header h1 {
+margin: 0;
+font-size: 32px;
+}
 
-<link rel="stylesheet"
-href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css"/>
+#lastUpdated {
+margin-top: 8px;
+font-size: 14px;
+opacity: 0.8;
+}
 
-<link rel="stylesheet"
-href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css"/>
+/* CONTROLS */
 
-</head>
+.controls {
+display: flex;
+gap: 10px;
+padding: 20px;
+flex-wrap: wrap;
+justify-content: center;
+align-items: center;
+background: #ffffff;
+border-bottom: 1px solid #ddd;
+}
 
-<body>
+.controls input,
+.controls select {
+padding: 10px;
+font-size: 14px;
+border: 1px solid #ccc;
+border-radius: 4px;
+}
 
-<header class="header">
-<h1>Football Officiating Camps</h1>
-<p id="lastUpdated"></p>
-</header>
+/* MAP */
 
-<section class="controls">
+#map {
+height: 420px;
+width: 100%;
+max-width: 1200px;
+margin: 20px auto;
+border-radius: 6px;
+border: 1px solid #ddd;
+}
 
-<input id="searchBox" placeholder="Search camp or location">
+/* TABLE */
 
-<select id="monthFilter">
-<option value="">All Months</option>
-<option value="Jan">Jan</option>
-<option value="Feb">Feb</option>
-<option value="Mar">Mar</option>
-<option value="Apr">Apr</option>
-<option value="May">May</option>
-<option value="Jun">Jun</option>
-<option value="Jul">Jul</option>
-</select>
+table {
+width: 100%;
+max-width: 1200px;
+margin: 20px auto;
+border-collapse: collapse;
+background: white;
+box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
 
-<select id="regionFilter">
-<option value="">All Regions</option>
-</select>
+th, td {
+padding: 12px;
+border-bottom: 1px solid #ddd;
+text-align: left;
+font-size: 14px;
+}
 
-<select id="stateFilter">
-<option value="">All States</option>
-</select>
+th {
+background: #f1f5f9;
+font-weight: 600;
+}
 
-</section>
+tr:hover {
+background: #f9fafb;
+}
 
-<div id="map"></div>
+td a {
+color: #2563eb;
+text-decoration: none;
+}
 
-<table id="campTable">
-
-<thead>
-<tr>
-<th>Camp</th>
-<th>Location</th>
-<th>State</th>
-<th>Region</th>
-<th>Date</th>
-<th>Replay</th>
-<th>Link</th>
-</tr>
-</thead>
-
-<tbody></tbody>
-
-</table>
-
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
-
-<script src="script.js"></script>
-
-</body>
-</html>
+td a:hover {
+text-decoration: underline;
+}
