@@ -2,20 +2,22 @@ const DATA_URL =
 "https://docs.google.com/spreadsheets/d/e/2PACX-1vTAg8dG8C3NattrTr95K_v4A7bQ5K9MazH9o59V0xZyLNnkoUv7y8FjvWmjA1T-yoh6wgCI_Ts9Etwp/gviz/tq?tqx=out:csv";
 
 let map;
-let markers=[];
+let markerCluster;
+let allCamps=[];
 
 async function loadCamps(){
 
 const response=await fetch(DATA_URL);
 const csv=await response.text();
 
-const camps=parseCSV(csv);
+allCamps=parseCSV(csv);
 
 initMap();
-populateFilters(camps);
-renderTable(camps);
-addMarkers(camps);
-setupFilters(camps);
+populateFilters(allCamps);
+render(allCamps);
+
+setupFilters();
+setupViewToggle();
 
 document.getElementById("lastUpdated").textContent=
 "Last updated "+new Date().toLocaleDateString();
@@ -25,7 +27,6 @@ document.getElementById("lastUpdated").textContent=
 function parseCSV(csv){
 
 const lines=csv.trim().split("\n");
-
 const headers=parseRow(lines[0]);
 
 const idx=name=>headers.indexOf(name);
@@ -47,12 +48,11 @@ for(let i=1;i<lines.length;i++){
 
 const row=parseRow(lines[i]);
 
-if(!row||row[iActive]?.toUpperCase()!=="TRUE") continue;
+if(!row) continue;
+if(row[iActive]?.toUpperCase()!=="TRUE") continue;
 
 const lat=parseFloat(row[iLat]);
 const lon=parseFloat(row[iLon]);
-
-if(isNaN(lat)||isNaN(lon)) continue;
 
 camps.push({
 name:row[iCamp],
@@ -75,7 +75,6 @@ return camps;
 function parseRow(row){
 
 const regex=/(".*?"|[^",]+)(?=\s*,|\s*$)/g;
-
 const matches=row.match(regex);
 
 if(!matches) return null;
@@ -93,18 +92,29 @@ L.tileLayer(
 {maxZoom:18}
 ).addTo(map);
 
+markerCluster=L.markerClusterGroup();
+map.addLayer(markerCluster);
+
 }
 
-function addMarkers(camps){
+function render(camps){
 
-markers.forEach(m=>map.removeLayer(m));
-markers=[];
+renderTable(camps);
+renderMarkers(camps);
+
+}
+
+function renderMarkers(camps){
+
+markerCluster.clearLayers();
 
 let bounds=[];
 
 camps.forEach(camp=>{
 
-const marker=L.marker([camp.lat,camp.lon]).addTo(map);
+if(!camp.lat||!camp.lon) return;
+
+const marker=L.marker([camp.lat,camp.lon]);
 
 marker.bindPopup(
 "<b>"+camp.name+"</b><br>"+
@@ -113,7 +123,8 @@ camp.date+"<br>"+
 "<a href='"+camp.link+"' target='_blank'>Visit Camp</a>"
 );
 
-markers.push(marker);
+markerCluster.addLayer(marker);
+
 bounds.push([camp.lat,camp.lon]);
 
 });
@@ -173,7 +184,7 @@ stateFilter.appendChild(option);
 
 }
 
-function setupFilters(allCamps){
+function setupFilters(){
 
 const search=document.getElementById("searchBox");
 const month=document.getElementById("monthFilter");
@@ -206,8 +217,7 @@ return textMatch&&monthMatch&&regionMatch&&stateMatch;
 
 });
 
-renderTable(filtered);
-addMarkers(filtered);
+render(filtered);
 
 }
 
@@ -215,6 +225,26 @@ search.addEventListener("input",filter);
 month.addEventListener("change",filter);
 region.addEventListener("change",filter);
 state.addEventListener("change",filter);
+
+}
+
+function setupViewToggle(){
+
+const mapBtn=document.getElementById("mapBtn");
+const listBtn=document.getElementById("listBtn");
+
+const mapContainer=document.getElementById("mapContainer");
+const listContainer=document.getElementById("listContainer");
+
+mapBtn.onclick=()=>{
+mapContainer.classList.remove("hidden");
+listContainer.classList.add("hidden");
+};
+
+listBtn.onclick=()=>{
+mapContainer.classList.add("hidden");
+listContainer.classList.remove("hidden");
+};
 
 }
 
