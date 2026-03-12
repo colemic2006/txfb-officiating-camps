@@ -1,5 +1,5 @@
 body{
-font-family:Arial, sans-serif;
+font-family:Arial,sans-serif;
 margin:0;
 background:#f4f6f8;
 }
@@ -25,14 +25,28 @@ padding:10px;
 font-size:14px;
 }
 
+.viewToggle{
+display:flex;
+gap:6px;
+}
+
+.viewToggle button{
+padding:10px 14px;
+cursor:pointer;
+}
+
+#mapContainer{
+max-width:1200px;
+margin:auto;
+}
+
 #map{
 height:420px;
 margin:20px auto;
-max-width:1200px;
 border-radius:8px;
 }
 
-.listSection{
+#listContainer{
 max-width:1200px;
 margin:auto;
 }
@@ -55,10 +69,14 @@ th{
 background:#f1f5f9;
 }
 
+.hidden{
+display:none;
+}
+
 @media(max-width:700px){
 
 #map{
-height:350px;
+height:340px;
 }
 
 table{
