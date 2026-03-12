@@ -1,33 +1,15 @@
-/* GLOBAL */
-
 body {
 font-family: Arial, sans-serif;
 margin: 0;
 background: #f4f6f8;
-color: #111;
 }
-
-/* HEADER */
 
 .header {
 background: #0f172a;
 color: white;
 text-align: center;
-padding: 40px 20px;
+padding: 40px;
 }
-
-.header h1 {
-margin: 0;
-font-size: 32px;
-}
-
-#lastUpdated {
-margin-top: 8px;
-font-size: 14px;
-opacity: 0.8;
-}
-
-/* CONTROLS */
 
 .controls {
 display: flex;
@@ -35,20 +17,13 @@ gap: 10px;
 padding: 20px;
 flex-wrap: wrap;
 justify-content: center;
-align-items: center;
-background: #ffffff;
-border-bottom: 1px solid #ddd;
 }
 
 .controls input,
 .controls select {
 padding: 10px;
 font-size: 14px;
-border: 1px solid #ccc;
-border-radius: 4px;
 }
-
-/* MAP */
 
 #map {
 height: 420px;
@@ -56,10 +31,7 @@ width: 100%;
 max-width: 1200px;
 margin: 20px auto;
 border-radius: 6px;
-border: 1px solid #ddd;
 }
-
-/* TABLE */
 
 table {
 width: 100%;
@@ -67,30 +39,14 @@ max-width: 1200px;
 margin: 20px auto;
 border-collapse: collapse;
 background: white;
-box-shadow: 0 2px 8px rgba(0,0,0,0.08);
 }
 
 th, td {
 padding: 12px;
 border-bottom: 1px solid #ddd;
 text-align: left;
-font-size: 14px;
 }
 
 th {
 background: #f1f5f9;
-font-weight: 600;
-}
-
-tr:hover {
-background: #f9fafb;
-}
-
-td a {
-color: #2563eb;
-text-decoration: none;
-}
-
-td a:hover {
-text-decoration: underline;
 }
