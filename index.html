@@ -21,7 +21,7 @@
       <div class="header-brand">
         <div class="brand-mark">College Football</div>
         <div>
-          <div class="brand-title">Officiating Camps and CLinics</div>
+          <div class="brand-title">Officiating Camps</div>
           <div class="brand-subtitle">Camp/Clinic Finder &amp; Directory</div>
         </div>
       </div>
@@ -46,92 +46,3 @@
           <span class="stat-label">Replay Available</span>
           <span class="stat-value" id="statReplay">—</span>
         </div>
-        <div class="stat-updated">
-          <div class="live-dot"></div>
-          <span class="stat-label" id="lastUpdated"></span>
-        </div>
-      </div>
-    </div>
-
-  </header>
-
-  <!-- FILTERS -->
-  <div class="controls-section">
-    <div class="controls-inner">
-      <span class="controls-label">Filter:</span>
-
-      <input id="searchBox" placeholder="Search camp or location…">
-
-      <select id="monthFilter">
-        <option value="">All Months</option>
-        <option value="Jan">Jan</option>
-        <option value="Feb">Feb</option>
-        <option value="Mar">Mar</option>
-        <option value="Apr">Apr</option>
-        <option value="May">May</option>
-        <option value="Jun">Jun</option>
-        <option value="Jul">Jul</option>
-      </select>
-
-      <select id="regionFilter">
-        <option value="">All Regions</option>
-      </select>
-
-      <select id="stateFilter">
-        <option value="">All States</option>
-      </select>
-    </div>
-  </div>
-
-  <!-- MAIN CONTENT -->
-  <div class="content">
-
-    <!-- MAP -->
-    <div class="map-card">
-      <div class="card-header">
-        <span class="card-title">Camp Locations</span>
-        <span class="card-meta">OpenStreetMap</span>
-      </div>
-      <div id="map"></div>
-    </div>
-
-    <!-- TABLE -->
-    <div class="table-card">
-      <div class="table-card-header">
-        <span class="card-title">Camp Directory</span>
-        <span id="resultCount"></span>
-      </div>
-      <div class="table-scroll">
-        <table id="campTable">
-          <thead>
-            <tr>
-              <th>Camp</th>
-              <th>Location</th>
-              <th>State</th>
-              <th>Region</th>
-              <th>Date</th>
-              <th>Replay</th>
-              <th>Link</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- SUBMISSION NOTICE -->
-    <div style="margin-top: 16px; padding: 12px 16px; background: #fff; border: 1px solid #e2e6ea; border-left: 3px solid #2d7a3a; border-radius: 6px; font-family: 'Barlow', sans-serif; font-size: 13px; color: #6b7280;">
-      Know of a camp or clinic not listed here? Send the details to
-      <a href="mailto:mcole1008@outlook.com" style="color: #2d7a3a; font-weight: 600; text-decoration: none;">mcole1008@outlook.com</a>
-      and we'll get it added.
-    </div>
-
-  </div>
-
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
-  <script src="script.js"></script>
-
-</body>
-</html>
