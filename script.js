@@ -1,225 +1,235 @@
-@import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap');
+document.addEventListener("DOMContentLoaded", function () {
 
-:root {
-  --bg:         #050a0e;
-  --surface:    #0c1318;
-  --surface2:   #111c24;
-  --border:     #1a2d3a;
-  --accent:     #00ff88;
-  --accent-dim: #00cc6a;
-  --accent-glow:#00ff8840;
-  --text:       #e2eaf0;
-  --text-muted: #5a7a8a;
-  --danger:     #ff4d6a;
-  --radius:     6px;
-}
+  const DATA_URL =
+    "https://docs.google.com/spreadsheets/d/e/2PACX-1vTAg8dG8C3NattrTr95K_v4A7bQ5K9MazH9o59V0xZyLNnkoUv7y8FjvWmjA1T-yoh6wgCI_Ts9Etwp/pub?gid=0&single=true&output=csv";
 
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  const tableBody = document.querySelector("#campTable tbody");
+  const searchBox = document.getElementById("searchBox");
+  const monthFilter = document.getElementById("monthFilter");
+  const regionFilter = document.getElementById("regionFilter");
+  const stateFilter = document.getElementById("stateFilter");
+  const resultCount = document.getElementById("resultCount");
 
-html { scroll-behavior: smooth; }
+  // Stats elements
+  const statCamps   = document.getElementById("statCamps");
+  const statStates  = document.getElementById("statStates");
+  const statRegions = document.getElementById("statRegions");
+  const statReplay  = document.getElementById("statReplay");
 
-body {
-  font-family: 'DM Sans', sans-serif;
-  background: var(--bg);
-  color: var(--text);
-  min-height: 100vh;
-  background-image:
-    radial-gradient(ellipse 80% 40% at 50% -10%, #00ff8810 0%, transparent 70%);
-}
+  let camps = [];
 
-/* ── HEADER ─────────────────────────────────────── */
+  // ── MAP SETUP (dark CartoDB tiles) ──────────────────────────
+  const map = L.map("map").setView([39.5, -98.35], 4);
 
-.header {
-  position: sticky;
-  top: 0;
-  z-index: 1000;
-  background: rgba(5, 10, 14, 0.92);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  border-bottom: 1px solid var(--border);
-  padding: 0 28px;
-}
+  L.tileLayer(
+    "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
+    {
+      attribution: '&copy; <a href="https://carto.com/">CARTO</a>',
+      subdomains: "abcd",
+      maxZoom: 19
+    }
+  ).addTo(map);
 
-.header-inner {
-  max-width: 1280px;
-  margin: 0 auto;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 20px;
-  padding: 16px 0;
-}
+  const cluster = L.markerClusterGroup({
+    iconCreateFunction: function (c) {
+      const count = c.getChildCount();
+      return L.divIcon({
+        html: `<div style="
+          background: rgba(0,255,136,0.85);
+          color: #050a0e;
+          font-family: 'Space Mono', monospace;
+          font-weight: 700;
+          font-size: 12px;
+          width: 36px; height: 36px;
+          border-radius: 50%;
+          display: flex; align-items: center; justify-content: center;
+          border: 2px solid #fff;
+          box-shadow: 0 0 14px #00ff8880;
+        ">${count}</div>`,
+        className: "",
+        iconSize: [36, 36]
+      });
+    }
+  });
+  map.addLayer(cluster);
 
-.header-brand {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
+  // ── GLOWING GREEN MARKER ICON ────────────────────────────────
+  const glowIcon = L.divIcon({
+    className: "",
+    html: `<div class="glow-marker"></div>`,
+    iconSize: [14, 14],
+    iconAnchor: [7, 7],
+    popupAnchor: [0, -10]
+  });
 
-.brand-icon {
-  width: 36px;
-  height: 36px;
-  background: var(--accent);
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 18px;
-  flex-shrink: 0;
-  box-shadow: 0 0 16px var(--accent-glow);
-}
+  // ── LOAD DATA ────────────────────────────────────────────────
+  Papa.parse(DATA_URL, {
+    download: true,
+    header: true,
+    skipEmptyLines: true,
 
-.brand-text h1 {
-  font-family: 'Space Mono', monospace;
-  font-size: 15px;
-  font-weight: 700;
-  color: var(--text);
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  line-height: 1;
-}
+    complete: function (results) {
+      camps = results.data.filter(row =>
+        row.Active &&
+        row.Active.toString().trim().toUpperCase() === "TRUE"
+      );
 
-.brand-text #lastUpdated {
-  font-size: 11px;
-  color: var(--text-muted);
-  font-family: 'Space Mono', monospace;
-  margin-top: 3px;
-}
+      updateGlobalStats(camps);
+      populateFilters();
+      render(camps);
+    },
 
-/* ── STATS BAR ───────────────────────────────────── */
+    error: function (err) {
+      console.error("CSV load error:", err);
+    }
+  });
 
-.stats-bar {
-  display: flex;
-  gap: 6px;
-  flex-wrap: wrap;
-}
+  // ── GLOBAL STATS (always based on full dataset) ──────────────
+  function updateGlobalStats(data) {
+    const totalCamps   = data.length;
+    const uniqueStates = new Set(data.map(c => c.State).filter(Boolean)).size;
+    const uniqueRegions= new Set(data.map(c => c.Region).filter(Boolean)).size;
+    const replayCount  = data.filter(c =>
+      c.Replay && c.Replay.toString().trim().toUpperCase() === "TRUE"
+    ).length;
 
-.stat-chip {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  background: var(--surface2);
-  border: 1px solid var(--border);
-  border-radius: 40px;
-  padding: 6px 14px;
-  transition: border-color 0.2s, box-shadow 0.2s;
-}
+    animateCounter(statCamps,   totalCamps);
+    animateCounter(statStates,  uniqueStates);
+    animateCounter(statRegions, uniqueRegions);
+    animateCounter(statReplay,  replayCount);
+  }
 
-.stat-chip:hover {
-  border-color: var(--accent);
-  box-shadow: 0 0 10px var(--accent-glow);
-}
+  function animateCounter(el, target) {
+    let start = 0;
+    const duration = 600;
+    const step = (timestamp) => {
+      if (!start) start = timestamp;
+      const progress = Math.min((timestamp - start) / duration, 1);
+      el.textContent = Math.floor(progress * target);
+      if (progress < 1) requestAnimationFrame(step);
+      else el.textContent = target;
+    };
+    requestAnimationFrame(step);
+  }
 
-.stat-label {
-  font-size: 10px;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--text-muted);
-  font-family: 'Space Mono', monospace;
-}
+  // ── FILTERS ──────────────────────────────────────────────────
+  function populateFilters() {
+    const regions = [...new Set(camps.map(c => c.Region).filter(Boolean))].sort();
+    const states  = [...new Set(camps.map(c => c.State).filter(Boolean))].sort();
 
-.stat-value {
-  font-family: 'Space Mono', monospace;
-  font-size: 13px;
-  font-weight: 700;
-  color: var(--accent);
-}
+    regions.forEach(region => {
+      const option = document.createElement("option");
+      option.value = region;
+      option.textContent = region;
+      regionFilter.appendChild(option);
+    });
 
-/* ── CONTROLS ────────────────────────────────────── */
+    states.forEach(state => {
+      const option = document.createElement("option");
+      option.value = state;
+      option.textContent = state;
+      stateFilter.appendChild(option);
+    });
+  }
 
-.controls-wrapper {
-  max-width: 1280px;
-  margin: 28px auto 0;
-  padding: 0 28px;
-}
+  // ── RENDER ───────────────────────────────────────────────────
+  function render(data) {
+    renderTable(data);
+    renderMarkers(data);
+    resultCount.textContent = `${data.length} result${data.length !== 1 ? "s" : ""}`;
+  }
 
-.controls-label {
-  font-family: 'Space Mono', monospace;
-  font-size: 10px;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--text-muted);
-  margin-bottom: 10px;
-}
+  function renderTable(data) {
+    tableBody.innerHTML = "";
 
-.controls {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-}
+    if (data.length === 0) {
+      tableBody.innerHTML = `
+        <tr><td colspan="7">
+          <div class="empty-state">No camps match your filters.</div>
+        </td></tr>`;
+      return;
+    }
 
-.controls input,
-.controls select {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  color: var(--text);
-  border-radius: var(--radius);
-  padding: 10px 14px;
-  font-size: 13px;
-  font-family: 'DM Sans', sans-serif;
-  outline: none;
-  transition: border-color 0.2s, box-shadow 0.2s;
-  appearance: none;
-  -webkit-appearance: none;
-  min-width: 150px;
-}
+    data.forEach(camp => {
+      const row = document.createElement("tr");
 
-.controls input::placeholder { color: var(--text-muted); }
+      const replayVal = (camp.Replay || "").toString().trim().toUpperCase();
+      const isReplay  = replayVal === "TRUE";
+      const replayBadge = isReplay
+        ? `<span class="badge badge-replay-yes">✓ Yes</span>`
+        : `<span class="badge badge-replay-no">No</span>`;
 
-.controls input:focus,
-.controls select:focus {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px var(--accent-glow);
-}
+      row.innerHTML = `
+        <td>${camp.Camp || ""}</td>
+        <td>${camp.Location || ""}</td>
+        <td><span class="badge badge-state">${camp.State || ""}</span></td>
+        <td><span class="badge badge-region">${camp.Region || ""}</span></td>
+        <td>${camp.Date || ""}</td>
+        <td>${replayBadge}</td>
+        <td><a href="${camp.Link || "#"}" target="_blank">Visit ↗</a></td>
+      `;
 
-.controls select {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%235a7a8a' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 12px center;
-  padding-right: 32px;
-  cursor: pointer;
-}
+      tableBody.appendChild(row);
+    });
+  }
 
-.controls select option { background: var(--surface2); }
+  function renderMarkers(data) {
+    cluster.clearLayers();
 
-/* ── MAP ─────────────────────────────────────────── */
+    const bounds = [];
 
-.map-wrapper {
-  max-width: 1280px;
-  margin: 24px auto 0;
-  padding: 0 28px;
-}
+    data.forEach(camp => {
+      const lat = parseFloat(camp.Latitude);
+      const lon = parseFloat(camp.Longitude);
+      if (isNaN(lat) || isNaN(lon)) return;
 
-#map {
-  height: 440px;
-  width: 100%;
-  border-radius: 10px;
-  border: 1px solid var(--border);
-  box-shadow: 0 0 40px #00000060, 0 0 0 1px #00ff8810;
-  overflow: hidden;
-}
+      const marker = L.marker([lat, lon], { icon: glowIcon });
 
-/* Leaflet popup dark style */
-.leaflet-popup-content-wrapper {
-  background: var(--surface2) !important;
-  border: 1px solid var(--accent) !important;
-  border-radius: 8px !important;
-  color: var(--text) !important;
-  box-shadow: 0 0 20px var(--accent-glow) !important;
-}
-.leaflet-popup-tip { background: var(--surface2) !important; }
-.leaflet-popup-content { font-family: 'DM Sans', sans-serif; font-size: 13px; }
-.leaflet-popup-content b { color: var(--accent); font-family: 'Space Mono', monospace; font-size: 12px; }
+      marker.bindPopup(`
+        <b>${camp.Camp}</b><br>
+        ${camp.Location}${camp.State ? ", " + camp.State : ""}
+      `);
 
-/* Custom glowing green marker */
-.glow-marker {
-  width: 14px !important;
-  height: 14px !important;
-  background: var(--accent);
-  border-radius: 50%;
-  border: 2px solid #fff;
-  box-shadow: 0 0 10px var(--accent), 0 0 20px var(--accent-glow);
-}
+      cluster.addLayer(marker);
+      bounds.push([lat, lon]);
+    });
 
-/* Cluster icon overrides */
-.marker-cl
+    if (bounds.length) {
+      map.fitBounds(bounds, { padding: [40, 40] });
+    }
+  }
+
+  // ── FILTER LOGIC ─────────────────────────────────────────────
+  function applyFilters() {
+    const text   = searchBox.value.toLowerCase();
+    const month  = monthFilter.value;
+    const region = regionFilter.value;
+    const state  = stateFilter.value;
+
+    const filtered = camps.filter(camp => {
+      const textMatch =
+        (camp.Camp     || "").toLowerCase().includes(text) ||
+        (camp.Location || "").toLowerCase().includes(text);
+
+      const monthMatch  = !month  || (camp.Date   || "").includes(month);
+      const regionMatch = !region || camp.Region === region;
+      const stateMatch  = !state  || camp.State  === state;
+
+      return textMatch && monthMatch && regionMatch && stateMatch;
+    });
+
+    render(filtered);
+  }
+
+  searchBox.addEventListener("input",  applyFilters);
+  monthFilter.addEventListener("change", applyFilters);
+  regionFilter.addEventListener("change", applyFilters);
+  stateFilter.addEventListener("change", applyFilters);
+
+  // ── TIMESTAMP ────────────────────────────────────────────────
+  document.getElementById("lastUpdated").textContent =
+    "Updated " + new Date().toLocaleDateString("en-US", {
+      month: "short", day: "numeric", year: "numeric"
+    });
+
+});
