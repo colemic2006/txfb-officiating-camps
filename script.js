@@ -3,14 +3,12 @@ document.addEventListener("DOMContentLoaded", function () {
   const DATA_URL =
     "https://docs.google.com/spreadsheets/d/e/2PACX-1vTAg8dG8C3NattrTr95K_v4A7bQ5K9MazH9o59V0xZyLNnkoUv7y8FjvWmjA1T-yoh6wgCI_Ts9Etwp/pub?gid=0&single=true&output=csv";
 
-  const tableBody = document.querySelector("#campTable tbody");
-  const searchBox = document.getElementById("searchBox");
+  const tableBody   = document.querySelector("#campTable tbody");
+  const searchBox   = document.getElementById("searchBox");
   const monthFilter = document.getElementById("monthFilter");
-  const regionFilter = document.getElementById("regionFilter");
+  const regionFilter= document.getElementById("regionFilter");
   const stateFilter = document.getElementById("stateFilter");
   const resultCount = document.getElementById("resultCount");
-
-  // Stats elements
   const statCamps   = document.getElementById("statCamps");
   const statStates  = document.getElementById("statStates");
   const statRegions = document.getElementById("statRegions");
@@ -18,15 +16,14 @@ document.addEventListener("DOMContentLoaded", function () {
 
   let camps = [];
 
-  // ── MAP SETUP (dark CartoDB tiles) ──────────────────────────
+  // ── MAP SETUP ────────────────────────────────────────────────
   const map = L.map("map").setView([39.5, -98.35], 4);
 
   L.tileLayer(
-    "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
+    "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
     {
-      attribution: '&copy; <a href="https://carto.com/">CARTO</a>',
-      subdomains: "abcd",
-      maxZoom: 19
+      attribution: '&copy; <a href="https://openstreetmap.org">OpenStreetMap</a>',
+      maxZoom: 18
     }
   ).addTo(map);
 
@@ -35,28 +32,28 @@ document.addEventListener("DOMContentLoaded", function () {
       const count = c.getChildCount();
       return L.divIcon({
         html: `<div style="
-          background: rgba(0,255,136,0.85);
-          color: #050a0e;
-          font-family: 'Space Mono', monospace;
+          background: #2d7a3a;
+          color: #fff;
+          font-family: 'Barlow Condensed', sans-serif;
           font-weight: 700;
-          font-size: 12px;
-          width: 36px; height: 36px;
+          font-size: 13px;
+          width: 34px; height: 34px;
           border-radius: 50%;
           display: flex; align-items: center; justify-content: center;
           border: 2px solid #fff;
-          box-shadow: 0 0 14px #00ff8880;
+          box-shadow: 0 2px 8px rgba(0,0,0,0.3);
         ">${count}</div>`,
         className: "",
-        iconSize: [36, 36]
+        iconSize: [34, 34]
       });
     }
   });
   map.addLayer(cluster);
 
-  // ── GLOWING GREEN MARKER ICON ────────────────────────────────
-  const glowIcon = L.divIcon({
+  // ── MARKER ICON ──────────────────────────────────────────────
+  const fieldIcon = L.divIcon({
     className: "",
-    html: `<div class="glow-marker"></div>`,
+    html: `<div class="field-marker"></div>`,
     iconSize: [14, 14],
     iconAnchor: [7, 7],
     popupAnchor: [0, -10]
@@ -74,7 +71,7 @@ document.addEventListener("DOMContentLoaded", function () {
         row.Active.toString().trim().toUpperCase() === "TRUE"
       );
 
-      updateGlobalStats(camps);
+      updateStats(camps);
       populateFilters();
       render(camps);
     },
@@ -84,12 +81,12 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   });
 
-  // ── GLOBAL STATS (always based on full dataset) ──────────────
-  function updateGlobalStats(data) {
-    const totalCamps   = data.length;
-    const uniqueStates = new Set(data.map(c => c.State).filter(Boolean)).size;
-    const uniqueRegions= new Set(data.map(c => c.Region).filter(Boolean)).size;
-    const replayCount  = data.filter(c =>
+  // ── STATS BAR ────────────────────────────────────────────────
+  function updateStats(data) {
+    const totalCamps    = data.length;
+    const uniqueStates  = new Set(data.map(c => c.State).filter(Boolean)).size;
+    const uniqueRegions = new Set(data.map(c => c.Region).filter(Boolean)).size;
+    const replayCount   = data.filter(c =>
       c.Replay && c.Replay.toString().trim().toUpperCase() === "TRUE"
     ).length;
 
@@ -101,7 +98,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function animateCounter(el, target) {
     let start = 0;
-    const duration = 600;
+    const duration = 700;
     const step = (timestamp) => {
       if (!start) start = timestamp;
       const progress = Math.min((timestamp - start) / duration, 1);
@@ -118,17 +115,17 @@ document.addEventListener("DOMContentLoaded", function () {
     const states  = [...new Set(camps.map(c => c.State).filter(Boolean))].sort();
 
     regions.forEach(region => {
-      const option = document.createElement("option");
-      option.value = region;
-      option.textContent = region;
-      regionFilter.appendChild(option);
+      const opt = document.createElement("option");
+      opt.value = region;
+      opt.textContent = region;
+      regionFilter.appendChild(opt);
     });
 
     states.forEach(state => {
-      const option = document.createElement("option");
-      option.value = state;
-      option.textContent = state;
-      stateFilter.appendChild(option);
+      const opt = document.createElement("option");
+      opt.value = state;
+      opt.textContent = state;
+      stateFilter.appendChild(opt);
     });
   }
 
@@ -166,7 +163,7 @@ document.addEventListener("DOMContentLoaded", function () {
         <td><span class="badge badge-region">${camp.Region || ""}</span></td>
         <td>${camp.Date || ""}</td>
         <td>${replayBadge}</td>
-        <td><a href="${camp.Link || "#"}" target="_blank">Visit ↗</a></td>
+        <td><a href="${camp.Link || "#"}" target="_blank">Details ↗</a></td>
       `;
 
       tableBody.appendChild(row);
@@ -183,11 +180,12 @@ document.addEventListener("DOMContentLoaded", function () {
       const lon = parseFloat(camp.Longitude);
       if (isNaN(lat) || isNaN(lon)) return;
 
-      const marker = L.marker([lat, lon], { icon: glowIcon });
+      const marker = L.marker([lat, lon], { icon: fieldIcon });
 
       marker.bindPopup(`
         <b>${camp.Camp}</b><br>
         ${camp.Location}${camp.State ? ", " + camp.State : ""}
+        ${camp.Date ? "<br>" + camp.Date : ""}
       `);
 
       cluster.addLayer(marker);
@@ -221,10 +219,10 @@ document.addEventListener("DOMContentLoaded", function () {
     render(filtered);
   }
 
-  searchBox.addEventListener("input",  applyFilters);
-  monthFilter.addEventListener("change", applyFilters);
+  searchBox.addEventListener("input",   applyFilters);
+  monthFilter.addEventListener("change",  applyFilters);
   regionFilter.addEventListener("change", applyFilters);
-  stateFilter.addEventListener("change", applyFilters);
+  stateFilter.addEventListener("change",  applyFilters);
 
   // ── TIMESTAMP ────────────────────────────────────────────────
   document.getElementById("lastUpdated").textContent =
