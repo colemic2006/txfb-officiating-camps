@@ -1,61 +1,225 @@
-document.addEventListener("DOMContentLoaded", function () {
+@import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap');
 
-  const DATA_URL =
-    "https://docs.google.com/spreadsheets/d/e/2PACX-1vTAg8dG8C3NattrTr95K_v4A7bQ5K9MazH9o59V0xZyLNnkoUv7y8FjvWmjA1T-yoh6wgCI_Ts9Etwp/pub?gid=0&single=true&output=csv";
+:root {
+  --bg:         #050a0e;
+  --surface:    #0c1318;
+  --surface2:   #111c24;
+  --border:     #1a2d3a;
+  --accent:     #00ff88;
+  --accent-dim: #00cc6a;
+  --accent-glow:#00ff8840;
+  --text:       #e2eaf0;
+  --text-muted: #5a7a8a;
+  --danger:     #ff4d6a;
+  --radius:     6px;
+}
 
-  const tableBody = document.querySelector("#campTable tbody");
-  const searchBox = document.getElementById("searchBox");
-  const monthFilter = document.getElementById("monthFilter");
-  const regionFilter = document.getElementById("regionFilter");
-  const stateFilter = document.getElementById("stateFilter");
-  const resultCount = document.getElementById("resultCount");
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-  // Stats elements
-  const statCamps   = document.getElementById("statCamps");
-  const statStates  = document.getElementById("statStates");
-  const statRegions = document.getElementById("statRegions");
-  const statReplay  = document.getElementById("statReplay");
+html { scroll-behavior: smooth; }
 
-  let camps = [];
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  background-image:
+    radial-gradient(ellipse 80% 40% at 50% -10%, #00ff8810 0%, transparent 70%);
+}
 
-  // ── MAP SETUP (dark CartoDB tiles) ──────────────────────────
-  const map = L.map("map").setView([39.5, -98.35], 4);
+/* ── HEADER ─────────────────────────────────────── */
 
-  L.tileLayer(
-    "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
-    {
-      attribution: '&copy; <a href="https://carto.com/">CARTO</a>',
-      subdomains: "abcd",
-      maxZoom: 19
-    }
-  ).addTo(map);
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  background: rgba(5, 10, 14, 0.92);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--border);
+  padding: 0 28px;
+}
 
-  const cluster = L.markerClusterGroup({
-    iconCreateFunction: function (c) {
-      const count = c.getChildCount();
-      return L.divIcon({
-        html: `<div style="
-          background: rgba(0,255,136,0.85);
-          color: #050a0e;
-          font-family: 'Space Mono', monospace;
-          font-weight: 700;
-          font-size: 12px;
-          width: 36px; height: 36px;
-          border-radius: 50%;
-          display: flex; align-items: center; justify-content: center;
-          border: 2px solid #fff;
-          box-shadow: 0 0 14px #00ff8880;
-        ">${count}</div>`,
-        className: "",
-        iconSize: [36, 36]
-      });
-    }
-  });
-  map.addLayer(cluster);
+.header-inner {
+  max-width: 1280px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 16px 0;
+}
 
-  // ── GLOWING GREEN MARKER ICON ────────────────────────────────
-  const glowIcon = L.divIcon({
-    className: "",
-    html: `<div class="glow-marker"></div>`,
-    iconSize: [14, 14],
-    iconAnchor: [7, 7]
+.header-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.brand-icon {
+  width: 36px;
+  height: 36px;
+  background: var(--accent);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+  box-shadow: 0 0 16px var(--accent-glow);
+}
+
+.brand-text h1 {
+  font-family: 'Space Mono', monospace;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  line-height: 1;
+}
+
+.brand-text #lastUpdated {
+  font-size: 11px;
+  color: var(--text-muted);
+  font-family: 'Space Mono', monospace;
+  margin-top: 3px;
+}
+
+/* ── STATS BAR ───────────────────────────────────── */
+
+.stats-bar {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.stat-chip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 40px;
+  padding: 6px 14px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.stat-chip:hover {
+  border-color: var(--accent);
+  box-shadow: 0 0 10px var(--accent-glow);
+}
+
+.stat-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  font-family: 'Space Mono', monospace;
+}
+
+.stat-value {
+  font-family: 'Space Mono', monospace;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+/* ── CONTROLS ────────────────────────────────────── */
+
+.controls-wrapper {
+  max-width: 1280px;
+  margin: 28px auto 0;
+  padding: 0 28px;
+}
+
+.controls-label {
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 10px;
+}
+
+.controls {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.controls input,
+.controls select {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text);
+  border-radius: var(--radius);
+  padding: 10px 14px;
+  font-size: 13px;
+  font-family: 'DM Sans', sans-serif;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  appearance: none;
+  -webkit-appearance: none;
+  min-width: 150px;
+}
+
+.controls input::placeholder { color: var(--text-muted); }
+
+.controls input:focus,
+.controls select:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+.controls select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%235a7a8a' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 32px;
+  cursor: pointer;
+}
+
+.controls select option { background: var(--surface2); }
+
+/* ── MAP ─────────────────────────────────────────── */
+
+.map-wrapper {
+  max-width: 1280px;
+  margin: 24px auto 0;
+  padding: 0 28px;
+}
+
+#map {
+  height: 440px;
+  width: 100%;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  box-shadow: 0 0 40px #00000060, 0 0 0 1px #00ff8810;
+  overflow: hidden;
+}
+
+/* Leaflet popup dark style */
+.leaflet-popup-content-wrapper {
+  background: var(--surface2) !important;
+  border: 1px solid var(--accent) !important;
+  border-radius: 8px !important;
+  color: var(--text) !important;
+  box-shadow: 0 0 20px var(--accent-glow) !important;
+}
+.leaflet-popup-tip { background: var(--surface2) !important; }
+.leaflet-popup-content { font-family: 'DM Sans', sans-serif; font-size: 13px; }
+.leaflet-popup-content b { color: var(--accent); font-family: 'Space Mono', monospace; font-size: 12px; }
+
+/* Custom glowing green marker */
+.glow-marker {
+  width: 14px !important;
+  height: 14px !important;
+  background: var(--accent);
+  border-radius: 50%;
+  border: 2px solid #fff;
+  box-shadow: 0 0 10px var(--accent), 0 0 20px var(--accent-glow);
+}
+
+/* Cluster icon overrides */
+.marker-cl
