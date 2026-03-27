@@ -59,6 +59,12 @@ document.addEventListener("DOMContentLoaded", function () {
     popupAnchor: [0, -10]
   });
 
+  // ── REPLAY CHECK HELPER ───────────────────────────────────────
+  function isReplayAvailable(val) {
+    const v = (val || "").toString().trim().toUpperCase();
+    return v === "TRUE" || v === "YES" || v === "Y" || v === "1";
+  }
+
   // ── LOAD DATA ────────────────────────────────────────────────
   Papa.parse(DATA_URL, {
     download: true,
@@ -86,9 +92,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const totalCamps    = data.length;
     const uniqueStates  = new Set(data.map(c => c.State).filter(Boolean)).size;
     const uniqueRegions = new Set(data.map(c => c.Region).filter(Boolean)).size;
-    const replayCount   = data.filter(c =>
-      c.Replay && c.Replay.toString().trim().toUpperCase() === "TRUE"
-    ).length;
+    const replayCount   = data.filter(c => isReplayAvailable(c.Replay)).length;
 
     animateCounter(statCamps,   totalCamps);
     animateCounter(statStates,  uniqueStates);
@@ -139,95 +143,4 @@ document.addEventListener("DOMContentLoaded", function () {
   function renderTable(data) {
     tableBody.innerHTML = "";
 
-    if (data.length === 0) {
-      tableBody.innerHTML = `
-        <tr><td colspan="7">
-          <div class="empty-state">No camps match your filters.</div>
-        </td></tr>`;
-      return;
-    }
-
-    data.forEach(camp => {
-      const row = document.createElement("tr");
-
-      const replayVal = (camp.Replay || "").toString().trim().toUpperCase();
-      const isReplay  = replayVal === "TRUE";
-      const replayBadge = isReplay
-        ? `<span class="badge badge-replay-yes">✓ Yes</span>`
-        : `<span class="badge badge-replay-no">No</span>`;
-
-      row.innerHTML = `
-        <td>${camp.Camp || ""}</td>
-        <td>${camp.Location || ""}</td>
-        <td><span class="badge badge-state">${camp.State || ""}</span></td>
-        <td><span class="badge badge-region">${camp.Region || ""}</span></td>
-        <td>${camp.Date || ""}</td>
-        <td>${replayBadge}</td>
-        <td><a href="${camp.Link || "#"}" target="_blank">Details ↗</a></td>
-      `;
-
-      tableBody.appendChild(row);
-    });
-  }
-
-  function renderMarkers(data) {
-    cluster.clearLayers();
-
-    const bounds = [];
-
-    data.forEach(camp => {
-      const lat = parseFloat(camp.Latitude);
-      const lon = parseFloat(camp.Longitude);
-      if (isNaN(lat) || isNaN(lon)) return;
-
-      const marker = L.marker([lat, lon], { icon: fieldIcon });
-
-      marker.bindPopup(`
-        <b>${camp.Camp}</b><br>
-        ${camp.Location}${camp.State ? ", " + camp.State : ""}
-        ${camp.Date ? "<br>" + camp.Date : ""}
-      `);
-
-      cluster.addLayer(marker);
-      bounds.push([lat, lon]);
-    });
-
-    if (bounds.length) {
-      map.fitBounds(bounds, { padding: [40, 40] });
-    }
-  }
-
-  // ── FILTER LOGIC ─────────────────────────────────────────────
-  function applyFilters() {
-    const text   = searchBox.value.toLowerCase();
-    const month  = monthFilter.value;
-    const region = regionFilter.value;
-    const state  = stateFilter.value;
-
-    const filtered = camps.filter(camp => {
-      const textMatch =
-        (camp.Camp     || "").toLowerCase().includes(text) ||
-        (camp.Location || "").toLowerCase().includes(text);
-
-      const monthMatch  = !month  || (camp.Date   || "").includes(month);
-      const regionMatch = !region || camp.Region === region;
-      const stateMatch  = !state  || camp.State  === state;
-
-      return textMatch && monthMatch && regionMatch && stateMatch;
-    });
-
-    render(filtered);
-  }
-
-  searchBox.addEventListener("input",   applyFilters);
-  monthFilter.addEventListener("change",  applyFilters);
-  regionFilter.addEventListener("change", applyFilters);
-  stateFilter.addEventListener("change",  applyFilters);
-
-  // ── TIMESTAMP ────────────────────────────────────────────────
-  document.getElementById("lastUpdated").textContent =
-    "Updated " + new Date().toLocaleDateString("en-US", {
-      month: "short", day: "numeric", year: "numeric"
-    });
-
-});
+    if (data.l
