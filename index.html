@@ -1,83 +1,118 @@
+Here's the full `index.html` content:
+
+```html
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Football Officiating Camps</title>
 
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="style.css">
 
-<title>Football Officiating Camps</title>
-
-<link rel="stylesheet" href="style.css">
-
-<link rel="stylesheet"
-href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-
-<link rel="stylesheet"
-href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css"/>
-
-<link rel="stylesheet"
-href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css"/>
-
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css"/>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css"/>
 </head>
 
 <body>
 
-<header class="header">
-<h1>Football Officiating Camps</h1>
-<p id="lastUpdated"></p>
-</header>
+  <!-- STICKY HEADER -->
+  <header class="header">
+    <div class="header-inner">
 
-<section class="controls">
+      <div class="header-brand">
+        <div class="brand-icon">🏈</div>
+        <div class="brand-text">
+          <h1>Officiating Camps</h1>
+          <p id="lastUpdated"></p>
+        </div>
+      </div>
 
-<input id="searchBox" placeholder="Search camp or location">
+      <div class="stats-bar">
+        <div class="stat-chip">
+          <span class="stat-label">Active Camps</span>
+          <span class="stat-value" id="statCamps">—</span>
+        </div>
+        <div class="stat-chip">
+          <span class="stat-label">States</span>
+          <span class="stat-value" id="statStates">—</span>
+        </div>
+        <div class="stat-chip">
+          <span class="stat-label">Regions</span>
+          <span class="stat-value" id="statRegions">—</span>
+        </div>
+        <div class="stat-chip">
+          <span class="stat-label">Replay Avail.</span>
+          <span class="stat-value" id="statReplay">—</span>
+        </div>
+      </div>
 
-<select id="monthFilter">
-<option value="">All Months</option>
-<option value="Jan">Jan</option>
-<option value="Feb">Feb</option>
-<option value="Mar">Mar</option>
-<option value="Apr">Apr</option>
-<option value="May">May</option>
-<option value="Jun">Jun</option>
-<option value="Jul">Jul</option>
-</select>
+    </div>
+  </header>
 
-<select id="regionFilter">
-<option value="">All Regions</option>
-</select>
+  <!-- FILTERS -->
+  <div class="controls-wrapper">
+    <div class="controls-label">Filter Camps</div>
+    <div class="controls">
+      <input id="searchBox" placeholder="Search camp or location…">
 
-<select id="stateFilter">
-<option value="">All States</option>
-</select>
+      <select id="monthFilter">
+        <option value="">All Months</option>
+        <option value="Jan">Jan</option>
+        <option value="Feb">Feb</option>
+        <option value="Mar">Mar</option>
+        <option value="Apr">Apr</option>
+        <option value="May">May</option>
+        <option value="Jun">Jun</option>
+        <option value="Jul">Jul</option>
+      </select>
 
-</section>
+      <select id="regionFilter">
+        <option value="">All Regions</option>
+      </select>
 
-<div id="map"></div>
+      <select id="stateFilter">
+        <option value="">All States</option>
+      </select>
+    </div>
+  </div>
 
-<table id="campTable">
+  <!-- MAP -->
+  <div class="map-wrapper">
+    <div id="map"></div>
+  </div>
 
-<thead>
-<tr>
-<th>Camp</th>
-<th>Location</th>
-<th>State</th>
-<th>Region</th>
-<th>Date</th>
-<th>Replay</th>
-<th>Link</th>
-</tr>
-</thead>
+  <!-- TABLE -->
+  <div class="table-wrapper">
+    <div class="table-header">
+      <span class="table-title">Camp Directory</span>
+      <span id="resultCount"></span>
+    </div>
+    <div class="table-scroll">
+      <table id="campTable">
+        <thead>
+          <tr>
+            <th>Camp</th>
+            <th>Location</th>
+            <th>State</th>
+            <th>Region</th>
+            <th>Date</th>
+            <th>Replay</th>
+            <th>Link</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
 
-<tbody></tbody>
-
-</table>
-
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
-
-<script src="script.js"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+  <script src="script.js"></script>
 
 </body>
 </html>
+```
