@@ -3,16 +3,18 @@ document.addEventListener("DOMContentLoaded", function () {
   const DATA_URL =
     "https://docs.google.com/spreadsheets/d/e/2PACX-1vTAg8dG8C3NattrTr95K_v4A7bQ5K9MazH9o59V0xZyLNnkoUv7y8FjvWmjA1T-yoh6wgCI_Ts9Etwp/pub?gid=0&single=true&output=csv";
 
-  const tableBody   = document.querySelector("#campTable tbody");
-  const searchBox   = document.getElementById("searchBox");
-  const monthFilter = document.getElementById("monthFilter");
-  const regionFilter= document.getElementById("regionFilter");
-  const stateFilter = document.getElementById("stateFilter");
-  const resultCount = document.getElementById("resultCount");
-  const statCamps   = document.getElementById("statCamps");
-  const statStates  = document.getElementById("statStates");
-  const statRegions = document.getElementById("statRegions");
-  const statReplay  = document.getElementById("statReplay");
+  const FORMSPREE_URL = "https://formspree.io/f/xykbpbdo";
+
+  const tableBody    = document.querySelector("#campTable tbody");
+  const searchBox    = document.getElementById("searchBox");
+  const monthFilter  = document.getElementById("monthFilter");
+  const regionFilter = document.getElementById("regionFilter");
+  const stateFilter  = document.getElementById("stateFilter");
+  const resultCount  = document.getElementById("resultCount");
+  const statCamps    = document.getElementById("statCamps");
+  const statStates   = document.getElementById("statStates");
+  const statRegions  = document.getElementById("statRegions");
+  const statReplay   = document.getElementById("statReplay");
 
   let camps = [];
 
@@ -50,7 +52,6 @@ document.addEventListener("DOMContentLoaded", function () {
   });
   map.addLayer(cluster);
 
-  // ── MARKER ICON ──────────────────────────────────────────────
   const fieldIcon = L.divIcon({
     className: "",
     html: `<div class="field-marker"></div>`,
@@ -220,15 +221,97 @@ document.addEventListener("DOMContentLoaded", function () {
     render(filtered);
   }
 
-  searchBox.addEventListener("input",    applyFilters);
-  monthFilter.addEventListener("change", applyFilters);
-  regionFilter.addEventListener("change",applyFilters);
-  stateFilter.addEventListener("change", applyFilters);
+  searchBox.addEventListener("input",     applyFilters);
+  monthFilter.addEventListener("change",  applyFilters);
+  regionFilter.addEventListener("change", applyFilters);
+  stateFilter.addEventListener("change",  applyFilters);
 
   // ── TIMESTAMP ────────────────────────────────────────────────
   document.getElementById("lastUpdated").textContent =
     "Updated " + new Date().toLocaleDateString("en-US", {
       month: "short", day: "numeric", year: "numeric"
     });
+
+  // ── MODAL ────────────────────────────────────────────────────
+  const modal        = document.getElementById("submitModal");
+  const openBtn      = document.getElementById("openSubmitModal");
+  const closeBtn     = document.getElementById("closeSubmitModal");
+  const cancelBtn    = document.getElementById("cancelSubmit");
+  const successClose = document.getElementById("successClose");
+  const form         = document.getElementById("submitCampForm");
+  const submitBtn    = document.getElementById("submitBtn");
+  const formSuccess  = document.getElementById("formSuccess");
+  const formError    = document.getElementById("formError");
+
+  function openModal() {
+    modal.classList.add("is-open");
+    modal.setAttribute("aria-hidden", "false");
+    document.body.style.overflow = "hidden";
+  }
+
+  function closeModal() {
+    modal.classList.remove("is-open");
+    modal.setAttribute("aria-hidden", "true");
+    document.body.style.overflow = "";
+  }
+
+  function resetModal() {
+    form.reset();
+    form.hidden = false;
+    formSuccess.hidden = true;
+    formError.hidden = true;
+    submitBtn.classList.remove("is-loading");
+    submitBtn.disabled = false;
+  }
+
+  openBtn.addEventListener("click", () => {
+    resetModal();
+    openModal();
+  });
+
+  closeBtn.addEventListener("click", closeModal);
+  cancelBtn.addEventListener("click", closeModal);
+  successClose.addEventListener("click", closeModal);
+
+  // Close on backdrop click
+  modal.addEventListener("click", (e) => {
+    if (e.target === modal) closeModal();
+  });
+
+  // Close on Escape
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && modal.classList.contains("is-open")) closeModal();
+  });
+
+  // ── FORM SUBMIT ──────────────────────────────────────────────
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    formError.hidden = true;
+    submitBtn.classList.add("is-loading");
+    submitBtn.disabled = true;
+
+    const data = new FormData(form);
+
+    try {
+      const res = await fetch(FORMSPREE_URL, {
+        method: "POST",
+        body: data,
+        headers: { "Accept": "application/json" }
+      });
+
+      if (res.ok) {
+        form.hidden = true;
+        formSuccess.hidden = false;
+      } else {
+        throw new Error("Non-OK response");
+      }
+    } catch (err) {
+      console.error("Form submission error:", err);
+      formError.hidden = false;
+      submitBtn.classList.remove("is-loading");
+      submitBtn.disabled = false;
+    }
+  });
 
 });
