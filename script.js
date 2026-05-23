@@ -5,6 +5,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
   const FORMSPREE_URL = "https://formspree.io/f/xykbpbdo";
 
+  // Update this date whenever camp data is refreshed
+  const LAST_UPDATED = new Date("2026-04-01");
+
   const tableBody    = document.querySelector("#campTable tbody");
   const searchBox    = document.getElementById("searchBox");
   const monthFilter  = document.getElementById("monthFilter");
@@ -228,7 +231,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // ── TIMESTAMP ────────────────────────────────────────────────
   document.getElementById("lastUpdated").textContent =
-    "Updated " + new Date().toLocaleDateString("en-US", {
+    "Updated " + LAST_UPDATED.toLocaleDateString("en-US", {
       month: "short", day: "numeric", year: "numeric"
     });
 
