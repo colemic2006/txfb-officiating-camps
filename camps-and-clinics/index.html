@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>College Football Officiating Camps</title>
+
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css"/>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css"/>
+</head>
+
+<body>
+
+  <!-- STICKY HEADER -->
+  <header class="header">
+
+    <div class="header-top">
+      <div class="header-brand">
+        <div class="brand-mark">Officiating Camps</div>
+        <div>
+          <div class="brand-title">College Football</div>
+          <div class="brand-subtitle">Camp/Clinic Finder &amp; Directory</div>
+        </div>
+      </div>
+
+      <button class="submit-camp-btn" id="openSubmitModal">
+        <span class="submit-camp-btn-icon">+</span>
+        Submit a Camp
+      </button>
+    </div>
+
+    <!-- STATS TICKER -->
+    <div class="stats-ticker">
+      <div class="stats-ticker-inner">
+        <div class="stat-item">
+          <span class="stat-label">Active Camps</span>
+          <span class="stat-value" id="statCamps">—</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">States</span>
+          <span class="stat-value" id="statStates">—</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Regions</span>
+          <span class="stat-value" id="statRegions">—</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Replay Available</span>
+          <span class="stat-value" id="statReplay">—</span>
+        </div>
+        <div class="stat-updated">
+          <div class="live-dot"></div>
+          <span class="stat-label" id="lastUpdated"></span>
+        </div>
+      </div>
+    </div>
+
+  </header>
+
+  <!-- SUBMIT CAMP MODAL -->
+  <div class="modal-overlay" id="submitModal" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <div class="modal-header">
+        <div class="modal-title-group">
+          <span class="modal-eyebrow">Directory Submission</span>
+          <h2 class="modal-title" id="modalTitle">Submit a Camp or Clinic</h2>
+        </div>
+        <button class="modal-close" id="closeSubmitModal" aria-label="Close">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <p class="modal-description">
+          Know of a camp or clinic not listed here? Fill out the form below and we'll review it for inclusion.
+        </p>
+
+        <form id="submitCampForm" class="camp-form">
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="f-camp">Camp / Clinic Name <span class="required">*</span></label>
+              <input class="form-input" id="f-camp" name="camp_name" type="text" placeholder="e.g. Big 12 Officiating Camp" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="f-org">Organizing Body</label>
+              <input class="form-input" id="f-org" name="organization" type="text" placeholder="e.g. Big 12 Conference">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="f-location">City / Location <span class="required">*</span></label>
+              <input class="form-input" id="f-location" name="location" type="text" placeholder="e.g. Dallas, TX" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="f-state">State <span class="required">*</span></label>
+              <select class="form-input form-select" id="f-state" name="state" required>
+                <option value="">Select state…</option>
+                <option>AL</option><option>AK</option><option>AZ</option><option>AR</option>
+                <option>CA</option><option>CO</option><option>CT</option><option>DE</option>
+                <option>FL</option><option>GA</option><option>HI</option><option>ID</option>
+                <option>IL</option><option>IN</option><option>IA</option><option>KS</option>
+                <option>KY</option><option>LA</option><option>ME</option><option>MD</option>
+                <option>MA</option><option>MI</option><option>MN</option><option>MS</option>
+                <option>MO</option><option>MT</option><option>NE</option><option>NV</option>
+                <option>NH</option><option>NJ</option><option>NM</option><option>NY</option>
+                <option>NC</option><option>ND</option><option>OH</option><option>OK</option>
+                <option>OR</option><option>PA</option><option>RI</option><option>SC</option>
+                <option>SD</option><option>TN</option><option>TX</option><option>UT</option>
+                <option>VT</option><option>VA</option><option>WA</option><option>WV</option>
+                <option>WI</option><option>WY</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="f-date">Date(s)</label>
+              <input class="form-input" id="f-date" name="date" type="text" placeholder="e.g. June 14–15, 2025">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="f-link">Website / Registration Link</label>
+              <input class="form-input" id="f-link" name="link" type="url" placeholder="https://…">
+            </div>
+          </div>
+
+          <div class="form-group form-group-full">
+            <label class="form-label" for="f-notes">Additional Notes</label>
+            <textarea class="form-input form-textarea" id="f-notes" name="notes" placeholder="Anything else we should know — cost, skill level, contact info, etc." rows="3"></textarea>
+          </div>
+
+          <div class="form-actions">
+            <button type="button" class="btn-cancel" id="cancelSubmit">Cancel</button>
+            <button type="submit" class="btn-submit" id="submitBtn">
+              <span class="btn-label">Submit Camp</span>
+              <span class="btn-spinner" aria-hidden="true"></span>
+            </button>
+          </div>
+
+        </form>
+
+        <!-- Success / Error states -->
+        <div class="form-success" id="formSuccess" hidden>
+          <div class="form-success-icon">✓</div>
+          <div class="form-success-title">Submission Received</div>
+          <div class="form-success-msg">Thanks! We'll review the details and add it to the directory.</div>
+          <button class="btn-cancel" id="successClose">Close</button>
+        </div>
+
+        <div class="form-error-msg" id="formError" hidden>
+          Something went wrong. Please try again or email us directly.
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- FILTERS -->
+  <div class="controls-section">
+    <div class="controls-inner">
+      <span class="controls-label">Filter:</span>
+
+      <input id="searchBox" placeholder="Search camp or location…">
+
+      <select id="monthFilter">
+        <option value="">All Months</option>
+        <option value="Jan">Jan</option>
+        <option value="Feb">Feb</option>
+        <option value="Mar">Mar</option>
+        <option value="Apr">Apr</option>
+        <option value="May">May</option>
+        <option value="Jun">Jun</option>
+        <option value="Jul">Jul</option>
+      </select>
+
+      <select id="regionFilter">
+        <option value="">All Regions</option>
+      </select>
+
+      <select id="stateFilter">
+        <option value="">All States</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <div class="content">
+
+    <!-- BUY ME A COFFEE -->
+    <div style="margin-bottom: 16px; padding: 12px 16px; background: #fff; border: 1px solid #e2e6ea; border-radius: 6px; display: flex; align-items: center; gap: 20px; flex-wrap: wrap;">
+      <p style="font-family: 'Barlow', sans-serif; font-size: 13px; color: #6b7280; margin: 0; flex: 1; min-width: 200px;">
+        If you find this site useful, please consider chipping in to support the costs involved in providing this service free for officials.
+      </p>
+      <script type="text/javascript" src="https://cdnjs.buymeacoffee.com/1.0.0/button.prod.min.js" data-name="bmc-button" data-slug="colemic" data-color="#FFDD00" data-emoji="" data-font="Arial" data-text="Buy me a coffee" data-outline-color="#000000" data-font-color="#000000" data-coffee-color="#ffffff"></script>
+    </div>
+
+    <!-- MAP -->
+    <div class="map-card">
+      <div class="card-header">
+        <span class="card-title">Camp Locations</span>
+        <span class="card-meta">OpenStreetMap</span>
+      </div>
+      <div id="map"></div>
+    </div>
+
+    <!-- TABLE -->
+    <div class="table-card">
+      <div class="table-card-header">
+        <span class="card-title">Camp Directory</span>
+        <span id="resultCount"></span>
+      </div>
+      <div class="table-scroll">
+        <table id="campTable">
+          <thead>
+            <tr>
+              <th>Camp</th>
+              <th>Location</th>
+              <th>State</th>
+              <th>Region</th>
+              <th>Date</th>
+              <th>Replay</th>
+              <th>Link</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+
+  </div><!-- end .content -->
+
+  <!-- DISCLAIMER FOOTER -->
+  <footer style="margin-top: 24px; padding: 16px 20px; background: #f8f9fa; border-top: 1px solid #e2e6ea; text-align: center;">
+    <p style="font-family: 'Barlow', sans-serif; font-size: 12px; color: #9ca3af; margin: 0; line-height: 1.6;">
+      <strong style="color: #6b7280;">Disclaimer:</strong> This site is an independent directory and is not affiliated with, endorsed by, or supported by the College Football Officiating (CFO) organization, any collegiate athletic conference, or the NCAA. Camp and clinic listings are provided for informational purposes only.
+    </p>
+  </footer>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+  <script src="script.js"></script>
+
+</body>
+</html>
