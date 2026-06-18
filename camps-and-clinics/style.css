@@ -38,6 +38,12 @@ body {
   border-bottom: 3px solid var(--green);
 }
 
+.header-logo {
+  height: 44px;
+  width: auto;
+  display: block;
+}
+
 .header-top {
   max-width: 1280px;
   margin: 0 auto;
