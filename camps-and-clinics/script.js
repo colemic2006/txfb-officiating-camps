@@ -64,7 +64,7 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
   // ── LOAD DATA ────────────────────────────────────────────────
-  Papa.parse(DATA_URL, {
+Papa.parse(DATA_URL + "&t=" + Date.now(), {
     download: true,
     header: true,
     skipEmptyLines: true,
