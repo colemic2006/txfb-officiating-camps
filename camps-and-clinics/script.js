@@ -6,7 +6,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const FORMSPREE_URL = "https://formspree.io/f/xykbpbdo";
 
   // Update this date whenever camp data is refreshed
-  const LAST_UPDATED = new Date("2026-04-01");
+  const LAST_UPDATED = new Date("2026-06-28");
 
   const tableBody    = document.querySelector("#campTable tbody");
   const searchBox    = document.getElementById("searchBox");
