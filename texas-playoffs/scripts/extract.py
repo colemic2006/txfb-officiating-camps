@@ -33,26 +33,14 @@ except ImportError:
     pass
 
 # ── CONFIG ────────────────────────────────────────────────────────────────────
-# After you move your data to Google Sheets, paste each sheet's info here.
-# sheet_id: the long ID in your Google Sheet URL
-# chapter_stats_gid: the gid= number for the Chapter Stats tab (visible in URL when that tab is selected)
+# Direct "Publish to web" CSV URLs from Google Sheets.
+# To update these: open your Google Sheet → File → Share → Publish to web
+# → select the Chapter Stats tab → CSV → Copy Link → paste below.
 SHEETS_CONFIG = {
-    2022: {
-        "sheet_id": "YOUR_2022_SHEET_ID",
-        "chapter_stats_gid": "0",
-    },
-    2023: {
-        "sheet_id": "YOUR_2023_SHEET_ID",
-        "chapter_stats_gid": "0",
-    },
-    2024: {
-        "sheet_id": "YOUR_2024_SHEET_ID",
-        "chapter_stats_gid": "0",
-    },
-    2025: {
-        "sheet_id": "YOUR_2025_SHEET_ID",
-        "chapter_stats_gid": "0",
-    },
+    2025: "https://docs.google.com/spreadsheets/d/e/2PACX-1vTubxnna3F_XctN7E0HVDw5gtXw5-qOGeiPEK_UgWS22F4dewQKW5USDPLOLWdXiP9RB1sGdl8x35H3/pub?gid=1374929055&single=true&output=csv",
+    2024: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRZqobY63U93Jwl4y4Y7UMJEnGUh7dEMEYrSFVc5B5BmQEWQ0CKAXNOlBbmBTNfnP4eDe078q37mIPy/pub?gid=689869648&single=true&output=csv",
+    2023: "https://docs.google.com/spreadsheets/d/e/2PACX-1vSzJQHMYkLFfal6c9ScR4kVg4pW8wP2ZElYwjsF58W1D-G9fR0OMHMjI3CSazBjbcAAdYxAs4dFd0PZ/pub?gid=1317846843&single=true&output=csv",
+    2022: "https://docs.google.com/spreadsheets/d/e/2PACX-1vSLeMi-qPJxxgBV3yWHKJKc0vYfZsansYxN2FnHP1l0Ust_tBZNw_RPpQXRxHIMOrQM37VD0KNFqIVW/pub?gid=1731092132&single=true&output=csv",
 }
 
 EXCEL_FILES = {
@@ -307,9 +295,8 @@ def extract_from_excel(excel_path, year):
     return {"year": year, "chapters": chapters, "games": games}
 
 
-def fetch_sheet_csv(sheet_id, gid):
-    """Fetch a Google Sheet tab as CSV (requires the sheet to be published)."""
-    url = f"https://docs.google.com/spreadsheets/d/{sheet_id}/export?format=csv&gid={gid}"
+def fetch_sheet_csv(url):
+    """Fetch a published Google Sheet CSV URL."""
     req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
     with urllib.request.urlopen(req, timeout=30) as resp:
         return resp.read().decode("utf-8")
@@ -331,10 +318,10 @@ def csv_to_rows(csv_text):
     return [tuple(coerce(c) for c in row) for row in reader]
 
 
-def extract_from_sheets(year, config):
-    """Extract data from Google Sheets for a given year."""
+def extract_from_sheets(year, url):
+    """Extract data from a published Google Sheets CSV URL."""
     print(f"  Fetching {year} chapter stats from Google Sheets...")
-    csv_text = fetch_sheet_csv(config["sheet_id"], config["chapter_stats_gid"])
+    csv_text = fetch_sheet_csv(url)
     rows = csv_to_rows(csv_text)
     chapters = parse_chapter_stats_rows(rows)
     return {"year": year, "chapters": chapters, "games": []}
@@ -360,11 +347,11 @@ def main():
                 continue
             data = extract_from_excel(excel_file, year)
         else:
-            config = SHEETS_CONFIG.get(year, {})
-            if not config or config.get("sheet_id", "").startswith("YOUR_"):
-                print(f"  SKIP: Google Sheets not configured for {year}")
+            url = SHEETS_CONFIG.get(year)
+            if not url:
+                print(f"  SKIP: Google Sheets URL not configured for {year}")
                 continue
-            data = extract_from_sheets(year, config)
+            data = extract_from_sheets(year, url)
 
         out_file = OUT_DIR / f"{year}.json"
         with open(out_file, "w") as f:
