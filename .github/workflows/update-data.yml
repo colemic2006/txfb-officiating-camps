@@ -1,0 +1,39 @@
+name: Update Playoff Data from Google Sheets
+
+on:
+  # Run automatically every night at 2 AM Central (8 AM UTC)
+  schedule:
+    - cron: '0 8 * * *'
+  # Also allow manual triggering from the GitHub website
+  workflow_dispatch:
+
+jobs:
+  update-data:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install openpyxl
+
+      - name: Run data extraction from Google Sheets
+        run: python3 texas-playoffs/scripts/extract.py --source sheets
+
+      - name: Commit and push updated data
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git add texas-playoffs/public/data/
+          # Only commit if there are changes
+          if git diff --staged --quiet; then
+            echo "No data changes detected, skipping commit."
+          else
+            git commit -m "Auto-update: playoff data $(date +%Y-%m-%d)"
+            git push
+          fi
