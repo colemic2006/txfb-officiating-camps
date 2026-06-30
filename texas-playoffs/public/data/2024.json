@@ -1065,8 +1065,8 @@
             "6AD1": 0,
             "6AD2": 0
           },
-          "total": 6,
-          "cumulative": 13
+          "total": 7,
+          "cumulative": 14
         },
         "3": {
           "classifications": {
@@ -1084,7 +1084,7 @@
             "6AD2": 0
           },
           "total": 0,
-          "cumulative": 16
+          "cumulative": 17
         },
         "4": {
           "classifications": {
@@ -1102,10 +1102,10 @@
             "6AD2": 0
           },
           "total": 0,
-          "cumulative": 16
+          "cumulative": 17
         }
       },
-      "total": 16
+      "total": 17
     },
     {
       "code": "PBC",
