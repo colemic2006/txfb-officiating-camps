@@ -4,8 +4,6 @@ on:
   push:
     branches:
       - main
-    paths:
-      - 'texas-playoffs/**'
   workflow_dispatch:
 
 permissions:
@@ -29,20 +27,18 @@ jobs:
         with:
           node-version: '20'
           cache: 'npm'
-          cache-dependency-path: texas-playoffs/package-lock.json
+          cache-dependency-path: package-lock.json
 
       - name: Install dependencies
-        working-directory: texas-playoffs
         run: npm ci
 
       - name: Build app
-        working-directory: texas-playoffs
         run: npm run build
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: texas-playoffs/dist
+          path: dist
 
   deploy:
     needs: build
