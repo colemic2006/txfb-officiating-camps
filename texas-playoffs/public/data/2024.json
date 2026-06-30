@@ -1381,8 +1381,8 @@
             "6AD1": 0,
             "6AD2": 2
           },
-          "total": 9,
-          "cumulative": 45
+          "total": 10,
+          "cumulative": 46
         },
         "3": {
           "classifications": {
@@ -1400,7 +1400,7 @@
             "6AD2": 0
           },
           "total": 1,
-          "cumulative": 64
+          "cumulative": 65
         },
         "4": {
           "classifications": {
@@ -1418,10 +1418,10 @@
             "6AD2": 1
           },
           "total": 2,
-          "cumulative": 66
+          "cumulative": 67
         }
       },
-      "total": 66
+      "total": 67
     },
     {
       "code": "SFA",

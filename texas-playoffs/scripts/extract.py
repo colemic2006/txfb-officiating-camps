@@ -62,12 +62,12 @@ CLASSIFICATIONS = ["1AD1","1AD2","2AD1","2AD2","3AD1","3AD2","4AD1","4AD2","5AD1
 BRACKET_SHEETS = ["1A D1","1A D2","2A D1","2A D2","3A D1","3A D2","4A D1","4A D2","5A D1","5A D2","6A D1","6A D2"]
 
 ROUND_NAMES = {
-    1: "Area",
-    2: "Regionals",
-    3: "Quarterfinals",
-    4: "Semifinals",
-    5: "State Championship",
-    6: "State Championship",
+    1: "Bi-District",
+    2: "Area",
+    3: "Regionals",
+    4: "Quarterfinals",
+    5: "Semifinals",
+    6: "Championship",
 }
 
 # Known TASO chapter codes (3-letter abbreviations)
