@@ -64,7 +64,7 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
   // ── LOAD DATA ────────────────────────────────────────────────
-Papa.parse(DATA_URL + "&t=" + Date.now(), {
+  Papa.parse(DATA_URL + "&t=" + Date.now(), {
     download: true,
     header: true,
     skipEmptyLines: true,
@@ -154,6 +154,13 @@ Papa.parse(DATA_URL + "&t=" + Date.now(), {
 
     data.forEach(camp => {
       const row = document.createElement("tr");
+      const dateStr = (camp.Date || "").replace(/(\w+ \d+)-\d+/, '$1');
+      const campDate = new Date(dateStr);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      if (!isNaN(campDate) && campDate < today) {
+        row.classList.add("past-camp");
+      }
 
       const replayVal = (camp.Replay || "").toString().trim().toUpperCase();
       const isReplay  = replayVal === "TRUE" || replayVal === "YES" || replayVal === "Y" || replayVal === "1";
