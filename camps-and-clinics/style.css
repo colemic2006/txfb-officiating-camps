@@ -766,3 +766,7 @@ td a:hover { background: var(--green); }
   .modal { max-height: 95vh; }
   .submit-camp-btn .submit-camp-btn-icon { display: none; }
 }
+
+tr.past-camp td {
+  color: #cc0000;
+}
