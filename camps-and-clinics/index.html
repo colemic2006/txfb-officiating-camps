@@ -251,7 +251,26 @@
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
-  <script src="script2.js?v=2"></script>
+  <script src="script2.js?v=3"></script>
+<script>
+window.addEventListener('load', function() {
+  setTimeout(function() {
+    document.querySelectorAll('#campTable tbody tr').forEach(function(row) {
+      var dateCell = row.cells[4];
+      if (!dateCell) return;
+      var dateStr = dateCell.textContent.trim().replace(/(\w+ \d+)-\d+/, '$1');
+      var campDate = new Date(dateStr);
+      var today = new Date();
+      today.setHours(0,0,0,0);
+      if (!isNaN(campDate) && campDate < today) {
+        row.querySelectorAll('td').forEach(function(td) {
+          td.style.color = '#cc0000';
+        });
+      }
+    });
+  }, 2000);
+});
+</script>
 
 </body>
 </html>
