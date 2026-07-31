@@ -5,7 +5,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
   const FORMSPREE_URL = "https://formspree.io/f/xykbpbdo";
 
-  // Update this date whenever camp data is refreshed
   const LAST_UPDATED = new Date("2026-07-29");
 
   const tableBody    = document.querySelector("#campTable tbody");
@@ -78,6 +77,7 @@ document.addEventListener("DOMContentLoaded", function () {
       updateStats(camps);
       populateFilters();
       render(camps);
+      injectNote();
     },
 
     error: function (err) {
@@ -160,6 +160,9 @@ document.addEventListener("DOMContentLoaded", function () {
       today.setHours(0, 0, 0, 0);
       if (!isNaN(campDate) && campDate < today) {
         row.classList.add("past-camp");
+        row.querySelectorAll('td').forEach(function(td) {
+          td.style.color = '#cc0000';
+        });
       }
 
       const replayVal = (camp.Replay || "").toString().trim().toUpperCase();
@@ -178,8 +181,26 @@ document.addEventListener("DOMContentLoaded", function () {
         <td><a href="${camp.Link || "#"}" target="_blank">Details ↗</a></td>
       `;
 
+      if (!isNaN(campDate) && campDate < today) {
+        row.querySelectorAll('td').forEach(function(td) {
+          td.style.color = '#cc0000';
+        });
+      }
+
       tableBody.appendChild(row);
     });
+  }
+
+  // ── INJECT NOTE ──────────────────────────────────────────────
+  function injectNote() {
+    const tableCard = document.querySelector('.table-card-header');
+    if (!tableCard) return;
+    if (document.getElementById('past-camp-note')) return;
+    const note = document.createElement('div');
+    note.id = 'past-camp-note';
+    note.style.cssText = 'padding: 10px 16px; background: #fff8f8; border-bottom: 1px solid #f5c6c6; font-family: Barlow, sans-serif; font-size: 12px; color: #cc0000;';
+    note.innerHTML = '<strong>Note:</strong> Camps shown in red have passed their listed date. Where a 2027 edition is expected, updated information is not yet available.';
+    tableCard.insertAdjacentElement('afterend', note);
   }
 
   function renderMarkers(data) {
@@ -283,12 +304,10 @@ document.addEventListener("DOMContentLoaded", function () {
   cancelBtn.addEventListener("click", closeModal);
   successClose.addEventListener("click", closeModal);
 
-  // Close on backdrop click
   modal.addEventListener("click", (e) => {
     if (e.target === modal) closeModal();
   });
 
-  // Close on Escape
   document.addEventListener("keydown", (e) => {
     if (e.key === "Escape" && modal.classList.contains("is-open")) closeModal();
   });
